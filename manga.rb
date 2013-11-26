@@ -2,6 +2,11 @@ require 'nokogiri'
 require 'open-uri'
 require 'pry'
 require 'twitter'
+require 'sinatra'
+
+get '/' do
+  manga_parser = MangaParser.new
+end
 
 class MangaParser
   def initialize
@@ -63,5 +68,3 @@ class MangaParser
     end
   end
 end
-
-manga_parser = MangaParser.new

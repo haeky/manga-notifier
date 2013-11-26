@@ -4,6 +4,7 @@ ruby "1.9.3"
 
 gem 'nokogiri'
 gem 'twitter', '5.0.0'
+gem 'sinatra'
 
 group :debug do
   gem 'debugger'
