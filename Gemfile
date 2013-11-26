@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby "1.9.3"
 
 gem 'nokogiri'
-gem 'twitter'
+gem 'twitter', '5.0.0'
 
 group :debug do
   gem 'debugger'

@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
 require 'pry'
+require 'twitter'
 
 class MangaParser
   def initialize
@@ -8,6 +9,7 @@ class MangaParser
     @settings_path = 'manga.conf'
     @document = Nokogiri::HTML(open(@root_url))
     @settings = {}
+    configure_twitter
     parse_settings
     parse_website
     rewrite_settings
@@ -30,6 +32,7 @@ class MangaParser
       current_chapter = content.pop
       manga_name = content.join(' ')
       if @settings.has_key?(manga_name) && current_chapter.to_i > @settings[manga_name].to_i
+        tweet_update(manga_name, @settings[manga_name], current_chapter)
         @settings[manga_name] = current_chapter
       end
     end
@@ -44,6 +47,19 @@ class MangaParser
         output << "#{manga_name};#{current_chapter}\n"
       end
       f.puts output
+    end
+  end
+
+  def tweet_update(manga_name, old_chapter, new_chapter)
+    @client.update("#{manga_name} is now out ! #{old_chapter} -> #{new_chapter}")
+  end
+
+  def configure_twitter
+    @client = Twitter::REST::Client.new do |config|
+      config.consumer_key        = ENV['TWITTER_CONSUMER_KEY']
+      config.consumer_secret     = ENV['TWITTER_CONSUMER_SECRET']
+      config.access_token        = ENV['TWITTER_ACCESS_TOKEN']
+      config.access_token_secret = ENV['TWITTER_ACCESS_SECRET']
     end
   end
 end
