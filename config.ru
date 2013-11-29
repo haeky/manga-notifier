@@ -1,2 +1,2 @@
-require './manga'
+require './application'
 run Sinatra::Application
