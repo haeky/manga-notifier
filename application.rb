@@ -8,6 +8,7 @@ require 'active_record'
 
 require './config/environment'
 require './models/manga'
+require './models/mangapanda'
 
 get '/' do
   manga_parser = MangaParser.new
@@ -15,30 +16,29 @@ end
 
 class MangaParser
   def initialize
-    @root_url = 'http://www.mangapanda.com'
-    @document = Nokogiri::HTML(open(@root_url))
-    @settings = {}
     configure_twitter
-    parse_website
+    parse_websites
     ActiveRecord::Base.connection.close
   end
 
-  def parse_website
-    mangas = Manga.all
-    @document.css('a.chaptersrec').each do |link|
-      *manga_name, current_chapter = link.content.split
-      manga_name = manga_name.join(' ')
-      stored_manga = mangas.find{ |a| a.manga_name == manga_name }
-      if !stored_manga.nil? && current_chapter.to_i > stored_manga.chapter_number.to_i
-        tweet_update(manga_name, stored_manga.chapter_number, current_chapter)
-        stored_manga.chapter_number = current_chapter.to_i
-        stored_manga.save!
+  def parse_websites
+    websites = [Mangapanda.new]
+    for website in websites
+      website.parse do |stored_manga, updated_chapter|
+        tweet_update(stored_manga.manga_name, stored_manga.chapter_number, updated_chapter)
+        stored_manga.update_attribute :chapter_number, updated_chapter.to_i
       end
     end
   end
 
   def tweet_update(manga_name, old_chapter, new_chapter)
-    @client.update("#{manga_name} is now out ! #{old_chapter} -> #{new_chapter}")
+    binding.pry
+    output = "#{manga_name} is now out ! #{old_chapter} -> #{new_chapter}"
+    if Sinatra::Base.production?
+      @client.update(output)
+    else
+      puts output
+    end
   end
 
   def configure_twitter
