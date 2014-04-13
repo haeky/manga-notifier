@@ -10,14 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131128233143) do
+ActiveRecord::Schema.define(version: 20140413144006) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "mangas", force: true do |t|
-    t.string  "manga_name"
-    t.integer "chapter_number"
+  create_table "entries", force: true do |t|
+    t.string  "name"
+    t.integer "number"
+    t.integer "entry_type", default: 0
   end
 
 end

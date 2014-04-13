@@ -7,7 +7,7 @@ require 'pg'
 require 'active_record'
 
 require './config/environment'
-require './models/manga'
+require './models/entry'
 require './models/mangapanda'
 
 get '/' do
@@ -24,16 +24,15 @@ class MangaParser
   def parse_websites
     websites = [Mangapanda.new]
     for website in websites
-      website.parse do |stored_manga, updated_chapter|
-        tweet_update(stored_manga.manga_name, stored_manga.chapter_number, updated_chapter)
-        stored_manga.update_attribute :chapter_number, updated_chapter.to_i
+      website.parse do |stored_entry, updated_number|
+        tweet_update(stored_entry.name, stored_entry.number, updated_number)
+        stored_entry.update_attribute :number, updated_number.to_i
       end
     end
   end
 
-  def tweet_update(manga_name, old_chapter, new_chapter)
-    binding.pry
-    output = "#{manga_name} is now out ! #{old_chapter} -> #{new_chapter}"
+  def tweet_update(name, old_number, new_number)
+    output = "#{name} is now out ! #{old_number} -> #{new_number}"
     if Sinatra::Base.production?
       @client.update(output)
     else
