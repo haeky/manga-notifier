@@ -26,7 +26,7 @@ class MangaParser
     for website in websites
       website.parse do |stored_entry, updated_number|
         tweet_update(stored_entry.name, stored_entry.number, updated_number)
-        stored_entry.update_attribute :number, updated_number.to_i
+        update_database_entry(stored_entry, updated_number)
       end
     end
   end
@@ -38,6 +38,10 @@ class MangaParser
     else
       puts output
     end
+  end
+
+  def update_database_entry(stored_entry, updated_number)
+    stored_entry.update_attribute :number, updated_number.to_i if Sinatra::Base.production?
   end
 
   def configure_twitter
