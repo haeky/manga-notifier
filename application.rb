@@ -1,6 +1,5 @@
 require 'nokogiri'
 require 'open-uri'
-require 'pry'
 require 'twitter'
 require 'sinatra'
 require 'pg'
