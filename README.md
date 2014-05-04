@@ -1,4 +1,4 @@
 manga-tweet-bot-v2
 ==================
 
-This is a successor of manga-tweet-bot that will be written in Ruby and hosted on Heroku
+Bot that check websites for manga/anime and tweet when they are up! Written in Ruby and hosted on Heroku
