@@ -4,11 +4,15 @@ require 'twitter'
 require 'sinatra'
 require 'pg'
 require 'active_record'
-require 'pry'
+
+if Sinatra::Base.development?
+  require 'pry'
+end
 
 require './config/environment'
 require './models/entry'
 require './models/mangapanda'
+require './models/horriblesubs'
 
 get '/' do
   Entry.all.to_json
@@ -33,17 +37,17 @@ class WebParser
 
   def parse_websites
     puts "[#{Time.now()}] Initializing a new parsing"
-    websites = [Mangapanda.new]
+    websites = [Mangapanda.new, HorribleSubs.new]
     for website in websites
       website.parse do |stored_entry, updated_number|
-        tweet_update(stored_entry.name, stored_entry.number, updated_number)
+        tweet_update(stored_entry.entry_type, stored_entry.name, updated_number)
         update_database_entry(stored_entry, updated_number)
       end
     end
   end
 
-  def tweet_update(name, old_number, new_number)
-    output = "#{name} is now out ! #{old_number} -> #{new_number}"
+  def tweet_update(type, name, number)
+    output = "[#{Entry::Type.invert[type].to_s.capitalize!}] #{name} ##{number} is now out!"
     if Sinatra::Base.production?
       @client.update(output)
     else
