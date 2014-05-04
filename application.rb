@@ -4,23 +4,35 @@ require 'twitter'
 require 'sinatra'
 require 'pg'
 require 'active_record'
+require 'pry'
 
 require './config/environment'
 require './models/entry'
 require './models/mangapanda'
 
 get '/' do
-  manga_parser = MangaParser.new
+  Entry.all.to_json
 end
 
-class MangaParser
+Thread.new do
+  parser = WebParser.new
+  while true do
+    parser.parse_websites
+    sleep 120
+  end
+end
+
+class WebParser
   def initialize
     configure_twitter
-    parse_websites
+  end
+
+  def close
     ActiveRecord::Base.connection.close
   end
 
   def parse_websites
+    puts "[#{Time.now()}] Initializing a new parsing"
     websites = [Mangapanda.new]
     for website in websites
       website.parse do |stored_entry, updated_number|
@@ -35,7 +47,7 @@ class MangaParser
     if Sinatra::Base.production?
       @client.update(output)
     else
-      puts output
+      puts "[#{Time.now()}] #{output}"
     end
   end
 
