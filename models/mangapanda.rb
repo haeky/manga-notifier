@@ -3,7 +3,7 @@ require './models/site'
 class Mangapanda < Site
   def parse
     document = Nokogiri::HTML(open('http://www.mangapanda.com'))
-    type = Entry::Type[:manga]
+    type = Entry::TYPE[:manga]
     entries = Entry.all
     updated = []
     document.css('a.chaptersrec').each do |link|

@@ -3,7 +3,7 @@ require './models/site'
 class HorribleSubs < Site
   def parse
     document = Nokogiri::HTML(open('http://horriblesubs.info/lib/latest.php'))
-    type = Entry::Type[:anime]
+    type = Entry::TYPE[:anime]
     entries = Entry.all
     updated = []
     document.css('div.episode > text()').each do |link|
